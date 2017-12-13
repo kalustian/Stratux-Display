@@ -2,26 +2,35 @@ function relativePosition(pos1, pos2){
 
   let out = {};
 
-  let lat1 = Math.toRadians(pos1.lat);
+  /*let lat1 = Math.toRadians(pos1.lat);
   let lat2 = Math.toRadians(pos2.lat);
 
   let lon1 = Math.toRadians(pos1.lon);
   let lon2 = Math.toRadians(pos2.lon);
 
   let delta_lat = Math.toRadians((pos2.lat-pos1.lat));
-  let delta_lon = Math.toRadians((pos2.lon-pos1.lon));
+  let delta_lon = Math.toRadians((pos2.lon-pos1.lon));*/
+
+  let lat1 = pos1.lat;
+  let lat2 = pos2.lat;
+
+  let lon1 = pos1.lon;
+  let lon2 = pos2.lon;
+
+  let delta_lat = (pos2.lat-pos1.lat);
+  let delta_lon = (pos2.lon-pos1.lon);
 
   let a = Math.sin(delta_lat/2) * Math.sin(delta_lat/2) +
         Math.cos(lat1) * Math.cos(lat2) *
         Math.sin(delta_lon/2) * Math.sin(delta_lon/2);
   let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 
-  out.dist = R * c * m2nmi;
+  out.dist = c * Rxm2nmi;
 
   let y = Math.sin(lon2-lon1) * Math.cos(lat2);
   let x = Math.cos(lat1)*Math.sin(lat2) -
         Math.sin(lat1)*Math.cos(lat2)*Math.cos(lon2-lon1);
-  out.bearing = Math.toDegrees(Math.atan2(y, x) + position.rotation - PI/2);
+  out.bearing = Math.atan2(y, x) + position.rotation - PI/2;
 
   return out;
 
@@ -61,6 +70,11 @@ function trans_rev(){
 var oldRot = 0;
 function rot(newRot){
   oldRot = newRot;
+  rotate(newRot);
+}
+
+function rot_add(newRot){
+  oldRot += newRot;
   rotate(newRot);
 }
 
@@ -116,6 +130,15 @@ function dashedLine(x1, y1, x2, y2, l, g) {
         line(xx1, yy1, xx2, yy2);
         currentPos = currentPos + lPercent + gPercent;
     }
+}
+
+var loaded_states = 0;
+function activate(){
+  loaded_states ++;
+  if(loaded_states >= 6){
+    loadedJSON = true;
+    //loop();
+  }
 }
 
 // Converts from degrees to radians.
