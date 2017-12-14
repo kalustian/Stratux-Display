@@ -97,6 +97,42 @@ function drawScreenObjects(objects){
   }
 }
 
+function drawTrafficObjects(objects){
+  for(let key in objects){
+    if(!objects.hasOwnProperty(key)){
+      continue;
+    }
+    let obj = objects[key];
+    if(obj.pos.lat == 0 || obj.pos.lon == 0){
+      continue;
+    }
+    trans(obj.pos.x * map_scale, obj.pos.y * map_scale);
+    noStroke();
+    fill('#FF0000');
+
+    rot(Math.toRadians(obj.data.Track));
+
+    beginShape();
+    vertex(-5, 5);
+    vertex(5, 5);
+    vertex(0, -10);
+    endShape(CLOSE);
+
+    rot_rev();
+
+    //ellipse(0,0,20);
+    //console.log(obj.data.Reg + " : " + Math.toDegrees(obj.pos.lat) + " , " + Math.toDegrees(obj.pos.lon));
+    fill('#FFFFFF');
+    trans_add(screen_obj_const.airport_text_offset.x, -screen_obj_const.airport_text_offset.y);
+    rot(-position.rotation);
+    text(key, 0, 0);
+    rot_rev();
+
+
+    trans_rev();
+  }
+}
+
 var transform_params = {x: 0, y: 0, theta: 0};
 function configureCanvas(){
   let out = relativePosition(referencePos, position); // Bearing + Dist
@@ -205,8 +241,8 @@ function drawBands(){
 
   for(let i = 0; i < bands.length; i++){
     let characters = bands[i].toString().length;
-    let small = Math.round(bands[i] * map_scale<<1);
-    let small_text = Math.round(small / 2 * sqrt2ov2);
+    let small = bands[i] * map_scale * 2;
+    let small_text = small / 2 * sqrt2ov2;
     let rel = circleRelief(band_font_width * (characters + 1), small)/2;
 
     // Add band

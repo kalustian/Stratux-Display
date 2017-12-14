@@ -25,62 +25,63 @@ var airports;
 
 var json_imports = [];
 
+var url_pre = 'http://nornick3.zapto.org/';
+//var url_pre = 'http://192.168.10.1/display/';
 
 var loadedJSON = false;
 function preload() {
   clearShapeScreenObjects();
   calculateRangeConsts();
-   codefont = loadFont("http://nornick3.zapto.org/fonts/monaco.ttf");
-   imported_files = 8;
-   $.getJSON('http://nornick3.zapto.org/json/Airports.json', function(data) {
+   codefont = loadFont(url_pre + "fonts/monaco.ttf");
+   imported_files = 3;
+   $.getJSON(url_pre + 'json/Airports.json', function(data) {
         json_imports.push({id: ShapeType.AIRPORT, layer: 7, data:data})
-        //generateAirportScreenObjects(ShapeType.AIRPORT);
-        //generateShapeScreenObjects(data, ShapeType.AIRPORT, 7);
+        console.log("Process Airports");
         activate();
    });
-   $.getJSON('http://nornick3.zapto.org/json/Class_Airspace-B.json', function(data) {
+   $.getJSON(url_pre + 'json/Class_Airspace-B.json', function(data) {
         json_imports.push({id: ShapeType.CLASS_B, layer: 6, data: data.features})
         console.log("Process Class B");
         //generateShapeScreenObjects(data.features, ShapeType.CLASS_B, 6);
         activate();
    });
-   $.getJSON('http://nornick3.zapto.org/json/Class_Airspace-C.json', function(data) {
+   $.getJSON(url_pre + 'json/Class_Airspace-C.json', function(data) {
         json_imports.push({id: ShapeType.CLASS_C, layer: 5, data: data.features})
         console.log("Process Class C");
         //generateShapeScreenObjects(data.features, ShapeType.CLASS_C, 5);
         activate();
    });
-   $.getJSON('http://nornick3.zapto.org/json/Class_Airspace-D.json', function(data) {
+   $.getJSON(url_pre + 'json/Class_Airspace-D.json', function(data) {
         json_imports.push({id: ShapeType.CLASS_D, layer: 4, data: data.features})
         console.log("Process Class D");
         //generateShapeScreenObjects(data.features, ShapeType.CLASS_D, 4);
         activate();
    });
-   $.getJSON('http://nornick3.zapto.org/json/Class_Airspace-E.json', function(data) {
+   $.getJSON(url_pre + 'json/Class_Airspace-E.json', function(data) {
         json_imports.push({id: ShapeType.CLASS_E, layer: 3, data: data.features})
         console.log("Process Class E");
         //generateShapeScreenObjects(data.features, ShapeType.CLASS_E, 3);
         activate();
    });
-   $.getJSON('http://nornick3.zapto.org/json/United_States.json', function(data) {
+   $.getJSON(url_pre + 'json/United_States.json', function(data) {
         json_imports.push({id: ShapeType.STATE, layer: 0, data: data.features})
         console.log("Process State Borders");
         //generateShapeScreenObjects(data.features, ShapeType.STATE, 1);
         activate();
    });
-   $.getJSON('http://nornick3.zapto.org/json/Lakes.json', function(data) {
+   $.getJSON(url_pre + 'json/Lakes.json', function(data) {
         json_imports.push({id: ShapeType.LAKE, layer: 2, data: data.features})
         console.log("Process Lakes");
         //generateShapeScreenObjects(data.features, ShapeType.LAKE, 2);
         activate();
    });
-   /*$.getJSON('http://nornick3.zapto.org/json/Rivers.json', function(data) {
+   /*$.getJSON(url_pre + 'json/Rivers.json', function(data) {
         rivers = data.features;
         console.log("Process Rivers");
         //generateShapeScreenObjects(rivers, ShapeType.RIVER);
         activate();
    });*/
-   $.getJSON('http://nornick3.zapto.org/json/Urban.json', function(data) {
+   $.getJSON(url_pre + 'json/Urban.json', function(data) {
         json_imports.push({id: ShapeType.URBAN, layer: 1, data: data.features})
         urban = data.features;
         console.log("Process Urban Areas");
@@ -90,25 +91,22 @@ function preload() {
 }
 
 
-
+var conn;
 
 function setup(){
+
+  trafficInit();
+  situationInit();
+
   createCanvas(map_params.width, map_params.height);
   background('#0f82e6');
   //console.log(position);
   noLoop();
-  frameRate(30);
-
-
-
-  traffic_screen_objects.push(new ScreenObject(
-    ShapeType.TRAFFIC,
-    new Position(33.426594,-84.950748),
-    {name:"N2549Z",lat:33.426594, lon:-84.950748, alt:3500, hdg: 155}
-  ));
+  frameRate(12);
 
   // Calculate constants that only need to be calculated once ever
   initialScreenObjectConstants();
+
 
 
 }
@@ -120,7 +118,7 @@ var theta = 0;
 
 var val = 1;
 function draw(){
-  //map_scale = sin(theta) * 2 + 3;
+  //map_scale = sin(theta) * 0.01 + 3;
   //theta += 0.15;
   clear();
   background('#0f82e6');
@@ -149,8 +147,7 @@ function draw(){
     configureCanvas();
     // Draw items on the map
     drawScreenObjects(shape_screen_objects);
-    //drawScreenObjects(airport_screen_objects);
-    //drawScreenObjects(traffic_screen_objects);
+    drawTrafficObjects(traffic_screen_objects);
     // Restore the canvas for top-layer interface items
     restoreCanvas();
     // Draw static interface items
@@ -158,6 +155,10 @@ function draw(){
     drawBands();
     // Draw top-layer interface items
     drawUser();
+
+    console.log("T:" + trafficCount + " :: S:" + situationCount);
+    trafficCount = 0;
+    situationCount = 0;
   }else{
     // Draw an invalid "X"
     drawInvalid();
