@@ -1,22 +1,9 @@
 function relativePosition(pos1, pos2){
-
   let out = {};
-
-  /*let lat1 = Math.toRadians(pos1.lat);
-  let lat2 = Math.toRadians(pos2.lat);
-
-  let lon1 = Math.toRadians(pos1.lon);
-  let lon2 = Math.toRadians(pos2.lon);
-
-  let delta_lat = Math.toRadians((pos2.lat-pos1.lat));
-  let delta_lon = Math.toRadians((pos2.lon-pos1.lon));*/
-
   let lat1 = pos1.lat;
   let lat2 = pos2.lat;
-
   let lon1 = pos1.lon;
   let lon2 = pos2.lon;
-
   let delta_lat = (pos2.lat-pos1.lat);
   let delta_lon = (pos2.lon-pos1.lon);
 
@@ -24,7 +11,6 @@ function relativePosition(pos1, pos2){
         Math.cos(lat1) * Math.cos(lat2) *
         Math.sin(delta_lon/2) * Math.sin(delta_lon/2);
   let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
   out.dist = c * Rxm2nmi;
 
   let y = Math.sin(lon2-lon1) * Math.cos(lat2);
@@ -33,8 +19,16 @@ function relativePosition(pos1, pos2){
   out.bearing = Math.atan2(y, x) + position.rotation - PI/2;
 
   return out;
-
 }
+
+function bearingDistanceToLatLon(brng, d, lat, lon){
+  let out = {};
+  d = d / m2nmi;
+  out.lat = Math.asin( Math.sin(lat)*Math.cos(d/R) + Math.cos(lat)*Math.sin(d/R)*Math.cos(brng) );
+  out.lon = lon + Math.atan2(Math.sin(brng)*Math.sin(d/R)*Math.cos(lat), Math.cos(d/R)-Math.sin(lat)*Math.sin(out.lat));
+  return out;
+}
+
 
 //https://www.codeproject.com/Questions/626899/Converting-Latitude-And-Longitude-to-an-X-Y-Coordi
 /*function simpleRelativePosition(pos1, pos2){
@@ -82,63 +76,32 @@ function rot_rev(){
   rotate(-oldRot);
 }
 
-function dashedLine(x1, y1, x2, y2, l, g) {
-    var pc = dist(x1, y1, x2, y2) / 300;
-    var pcCount = 1;
-    var lPercent = gPercent = 0;
-    var currentPos = 0;
-    var xx1 = yy1 = xx2 = yy2 = 0;
-
-    while (int(pcCount * pc) < l) {
-        pcCount++
-    }
-    lPercent = pcCount;
-    pcCount = 1;
-    while (int(pcCount * pc) < g) {
-        pcCount++
-    }
-    gPercent = pcCount;
-
-    lPercent = lPercent / 300;
-    gPercent = gPercent / 300;
-    while (currentPos < 1) {
-        xx1 = lerp(x1, x2, currentPos);
-        yy1 = lerp(y1, y2, currentPos);
-        xx2 = lerp(x1, x2, currentPos + lPercent);
-        yy2 = lerp(y1, y2, currentPos + lPercent);
-        if (x1 > x2) {
-            if (xx2 < x2) {
-                xx2 = x2;
-            }
-        }
-        if (x1 < x2) {
-            if (xx2 > x2) {
-                xx2 = x2;
-            }
-        }
-        if (y1 > y2) {
-            if (yy2 < y2) {
-                yy2 = y2;
-            }
-        }
-        if (y1 < y2) {
-            if (yy2 > y2) {
-                yy2 = y2;
-            }
-        }
-
-        line(xx1, yy1, xx2, yy2);
-        currentPos = currentPos + lPercent + gPercent;
-    }
+function addLayer(layer){
+  while(shape_screen_objects[layer] === undefined){
+    shape_screen_objects.push([]);
+  }
 }
 
 var loaded_states = 0;
+var imported_files = 0;
 function activate(){
   loaded_states ++;
-  if(loaded_states >= 6){
+  if(loaded_states >= imported_files){
     loadedJSON = true;
-    //loop();
+    calculateCurrentBlock();
+    loop();
   }
+}
+
+function calculateCurrentBlock(){
+  object_count = 0;
+  clearShapeScreenObjects();
+  referencePos = new Position(Math.toDegrees(position.lat), Math.toDegrees(position.lon), 0, 0);
+  calculateRangeConsts();
+  for(let i = 0; i < json_imports.length; i++){
+    generateShapeScreenObjects(json_imports[i].data, json_imports[i].id, json_imports[i].layer);
+  }
+  console.log("Block recalculation: Objects: " + object_count);
 }
 
 // Converts from degrees to radians.

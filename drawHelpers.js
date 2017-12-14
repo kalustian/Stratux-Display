@@ -1,5 +1,3 @@
-
-
 var screen_obj_const = {};
 function screenObjectConstants(){
   screen_obj_const.airport_text_offset.x = screen_obj_const.airport_text_offset.d * cos(position.rotation + PI/4);
@@ -21,24 +19,21 @@ function initialScreenObjectConstants(){
   screen_obj_const.airport_text_offset.d = airport_radius * map_scale * sqrt2ov2 + 7
 }
 
-var range = {};
-function calculateRangeConsts(){
-  range.x = 0;
-  range.y = 0;
-}
 
-function inRange(obj){
-  //console.log(obj.x, obj.y);
-  return true;
-}
 
 var test;
+var object_count = 0;
 function drawScreenObjects(objects){
-  for(let i = 0; i < objects.length; i++){
-    let obj = objects[i];
+  object_count += objects.length;
+  for(let layer = 0; layer < objects.length; layer++){
+    for(let i = 0; i < objects[layer].length; i++){
+      let obj = objects[layer][i];
+      /*if(info == null){
+        noFill();
+        stroke('#FF0000');
+      }*/
 
-    switch(obj.type){
-      case ObjectTypes.AIRPORT:
+      if(obj.type === ShapeType.AIRPORT){
         trans(obj.pos.x * map_scale, obj.pos.y * map_scale);
         noStroke();
         fill(25,25,26);
@@ -49,50 +44,56 @@ function drawScreenObjects(objects){
         text(obj.data.icao, 0, 0);
         rot_rev();
         trans_rev();
-        break;
-      case ObjectTypes.TRAFFIC:
-        break;
-      case ObjectTypes.POLY:
-        let info = obj.data.info;
-        if(info == null){
-          noFill();
-          stroke('#FF0000');
-        }else if(info.CLASS != null){
-          noFill();
-          switch(info.CLASS){
-            case "B":
-              stroke('#bdbde7');
-              break;
-            case "C":
-              stroke('#0000FF');
-              break;
-            case "E":
-              stroke('#BC6ACD');
-              break;
-            case "D":
-              stroke('#FFFF00');
-              break;
-            default:
-              stroke('#00FF00');
-          }
-        }else if(info.STUSPS != null){
-          // State border
-          stroke('#FFFF00');
-        }else{
-          console.log(info);
-          stroke('#bdbde7');
+      }else if(obj.type === ShapeType.TRAFFIC){
+
+      }else{
+        // Poly shape
+        switch(obj.type){
+          case ShapeType.CLASS_B:
+            noFill();
+            stroke('#bdbde7');
+            break;
+          case ShapeType.CLASS_C:
+            noFill();
+            stroke('#0000FF');
+            break;
+          case ShapeType.CLASS_D:
+            noFill();
+            stroke('#00FF00');
+            break;
+          case ShapeType.CLASS_E:
+            noFill();
+            stroke('#BC6ACD');
+            break;
+          case ShapeType.STATE:
+            fill('#323432');
+            stroke('#FFFF00');
+            break;
+          case ShapeType.RIVER:
+            noFill();
+            stroke('#0f82e6');
+            break;
+          case ShapeType.LAKE:
+            fill('#0f82e6');
+            noStroke();
+            break;
+          case ShapeType.URBAN:
+            fill('#FFFF00');
+            noStroke();
+
+            break;
+          default:
+            noFill();
+            stroke('#bdbde7');
+            console.log(obj)
         }
         beginShape();
         for(let j = 0; j < obj.data.coords.length; j++){
           vertex(obj.data.coords[j].x * map_scale, obj.data.coords[j].y * map_scale);
         }
         endShape(CLOSE);
-        break;
-      default:
-        console.error("Unknwon ObjectType: " + obj.type);
-        break;
+      }
     }
-
   }
 }
 
@@ -109,6 +110,74 @@ function configureCanvas(){
 function restoreCanvas(){
   rotate(-transform_params.theta);
   translate(-transform_params.x, -transform_params.y);
+}
+
+function pixelToLatLon(x, y){
+  let center_x = map_params.widthdiv2;
+  let center_y = map_params.heightdiv2;
+  let d_x = x - center_x;
+  let d_y = y - center_y;
+  let out = {};
+  out.dist = sqrt(d_x * d_x + d_y * d_y) / map_scale;
+  out.angle = -atan2(d_y, d_x) + PI;
+  let tmp = bearingDistanceToLatLon(out.angle, out.dist, position.lat, position.lon);
+  //out.lat = Math.toDegrees(tmp.lat);
+  //out.lon = Math.toDegrees(tmp.lon);
+  out.lat = tmp.lat;
+  out.lon = tmp.lon;
+  return out;
+}
+
+function withinLimits(lat, lon, limits = range_limits){
+  lat = Math.toRadians(lat);
+  lon = Math.toRadians(lon);
+  let val = limits.lower_lat <= lat && limits.upper_lat >= lat && limits.lower_lon <= lon && limits.upper_lon >= lon;
+  return val;
+}
+
+var lat_lon_thresh_scale = 0.1;
+function rangeStillValid(){
+  // Save copy of the current range
+  let tmp_range = range_limits;
+  // Calculate range for edges of the screen
+  calculateRangeConsts(0);
+
+  // Calculate current lat and lon range values. Used to determine if the
+  // current block size is too big.
+  let lat_lon_thresh_scale = 0.1 / map_scale;
+  let lat_thresh = (tmp_range.upper_lat - tmp_range.lower_lat) - (range_limits.upper_lat - range_limits.lower_lat);
+  let lon_thresh = (tmp_range.upper_lon - tmp_range.lower_lon) - (range_limits.upper_lon - range_limits.lower_lon);
+  //console.log(lat_thresh);
+  // Check if the range is still valid
+  if(
+
+    !(range_limits.upper_lat >= tmp_range.upper_lat || range_limits.lower_lat <= tmp_range.lower_lat|| range_limits.upper_lon >= tmp_range.upper_lon || range_limits.lower_lon <= tmp_range.lower_lon)
+
+    &&
+
+    Math.max(lat_thresh, lon_thresh) < lat_lon_thresh_scale
+
+  ){
+    // Restore the range to the previous value;
+    range_limits = tmp_range;
+    return true;
+  }
+  return false;
+}
+
+var range_limits
+function calculateRangeConsts(offset = 50){
+  map_params.width = $(window).width();
+  map_params.height = $(window).height();
+  map_params.heightdiv2 = map_params.height>>1;
+  map_params.widthdiv2 = map_params.width>>1;
+  range_limits = {};
+  var tmp = pixelToLatLon(-offset, -offset);
+  range_limits.upper_lat = tmp.lat;
+  range_limits.lower_lon = tmp.lon;
+  tmp = pixelToLatLon(map_params.width + offset, map_params.height + offset);
+  range_limits.lower_lat = tmp.lat;
+  range_limits.upper_lon = tmp.lon;
 }
 
 
