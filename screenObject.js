@@ -2,7 +2,6 @@
 
 
 var referencePos = new Position(33.310680, -84.772372, 0, 0);
-
 function Position(lat, lon, x, y){
   this.lat = Math.toRadians(lat);
   this.lon = Math.toRadians(lon);

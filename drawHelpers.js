@@ -112,22 +112,6 @@ function restoreCanvas(){
   translate(-transform_params.x, -transform_params.y);
 }
 
-function pixelToLatLon(x, y){
-  let center_x = map_params.widthdiv2;
-  let center_y = map_params.heightdiv2;
-  let d_x = x - center_x;
-  let d_y = y - center_y;
-  let out = {};
-  out.dist = sqrt(d_x * d_x + d_y * d_y) / map_scale;
-  out.angle = -atan2(d_y, d_x) + PI;
-  let tmp = bearingDistanceToLatLon(out.angle, out.dist, position.lat, position.lon);
-  //out.lat = Math.toDegrees(tmp.lat);
-  //out.lon = Math.toDegrees(tmp.lon);
-  out.lat = tmp.lat;
-  out.lon = tmp.lon;
-  return out;
-}
-
 function withinLimits(lat, lon, limits = range_limits){
   lat = Math.toRadians(lat);
   lon = Math.toRadians(lon);
@@ -138,6 +122,7 @@ function withinLimits(lat, lon, limits = range_limits){
 var lat_lon_thresh_scale = 0.1;
 function rangeStillValid(){
   // Save copy of the current range
+  //debugger;
   let tmp_range = range_limits;
   // Calculate range for edges of the screen
   calculateRangeConsts(0);
@@ -171,13 +156,37 @@ function calculateRangeConsts(offset = 50){
   map_params.height = $(window).height();
   map_params.heightdiv2 = map_params.height>>1;
   map_params.widthdiv2 = map_params.width>>1;
+
   range_limits = {};
-  var tmp = pixelToLatLon(-offset, -offset);
+  /*var tmp = pixelToLatLon(-offset, -offset);
   range_limits.upper_lat = tmp.lat;
   range_limits.lower_lon = tmp.lon;
   tmp = pixelToLatLon(map_params.width + offset, map_params.height + offset);
   range_limits.lower_lat = tmp.lat;
-  range_limits.upper_lon = tmp.lon;
+  range_limits.upper_lon = tmp.lon;*/
+
+  let corners = [
+    pixelToLatLon(-offset, -offset),                                      // Top Left
+    pixelToLatLon(map_params.width + offset, -offset),                    // Top Right
+    pixelToLatLon(map_params.width + offset, map_params.height + offset), // Bottom Right
+    pixelToLatLon(-offset, map_params.height + offset)                    // Bottom Left
+  ];
+
+  /*noFill();
+  stroke('#FFFFFF');
+  beginShape();
+  vertex(-offset, -offset);
+  vertex(map_params.width + offset, -offset);
+  vertex(map_params.width + offset, map_params.height + offset);
+  vertex(-offset, map_params.height + offset);
+  endShape(CLOSE);*/
+
+  range_limits.upper_lat = Math.max(corners[0].lat, corners[1].lat, corners[2].lat, corners[3].lat);
+  range_limits.upper_lon = Math.max(corners[0].lon, corners[1].lon, corners[2].lon, corners[3].lon);
+
+  range_limits.lower_lat = Math.min(corners[0].lat, corners[1].lat, corners[2].lat, corners[3].lat);
+  range_limits.lower_lon = Math.min(corners[0].lon, corners[1].lon, corners[2].lon, corners[3].lon);
+
 }
 
 

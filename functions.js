@@ -29,6 +29,22 @@ function bearingDistanceToLatLon(brng, d, lat, lon){
   return out;
 }
 
+function pixelToLatLon(x, y){
+  let center_x = map_params.widthdiv2;
+  let center_y = map_params.heightdiv2;
+  let d_x = x - center_x;
+  let d_y = y - center_y;
+  let out = {};
+  out.dist = sqrt(d_x * d_x + d_y * d_y) / map_scale;
+  out.angle = -atan2(d_y, d_x) + PI + position.rotation - PI/2;
+  let tmp = bearingDistanceToLatLon(out.angle, out.dist, position.lat, position.lon);
+  //out.lat = Math.toDegrees(tmp.lat);
+  //out.lon = Math.toDegrees(tmp.lon);
+  out.lat = tmp.lat;
+  out.lon = tmp.lon;
+  return out;
+}
+
 
 //https://www.codeproject.com/Questions/626899/Converting-Latitude-And-Longitude-to-an-X-Y-Coordi
 /*function simpleRelativePosition(pos1, pos2){
@@ -95,12 +111,15 @@ function activate(){
 
 function calculateCurrentBlock(){
   object_count = 0;
+  let tmp_rotation = position.rotation;
+  calculateRangeConsts();
+  position.rotation = 0;
   clearShapeScreenObjects();
   referencePos = new Position(Math.toDegrees(position.lat), Math.toDegrees(position.lon), 0, 0);
-  calculateRangeConsts();
   for(let i = 0; i < json_imports.length; i++){
     generateShapeScreenObjects(json_imports[i].data, json_imports[i].id, json_imports[i].layer);
   }
+  position.rotation = tmp_rotation;
   console.log("Block recalculation: Objects: " + object_count);
 }
 

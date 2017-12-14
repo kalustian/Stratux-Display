@@ -1,7 +1,7 @@
 console.log("JS Active");
 
 // Current position of the airplane
-var position = {lat:Math.toRadians(33.310680), lon:Math.toRadians(-84.772372), alt:1000, rotation: 0};
+var position = {lat:Math.toRadians(33.310680), lon:Math.toRadians(-84.772372), alt:1000, rotation: 0.2};
 
 // Current position of the atl airport
 //var katl = {lat:33.633549, lon:-84.431150, alt:1000};
