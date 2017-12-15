@@ -44,8 +44,8 @@ function drawScreenObjects(objects){
         text(obj.data.icao, 0, 0);
         rot_rev();
         trans_rev();
-      }else if(obj.type === ShapeType.TRAFFIC){
-
+      }else if(obj.type === ShapeType.RIVER){
+        console.log("River");
       }else{
         // Poly shape
         switch(obj.type){
@@ -66,7 +66,7 @@ function drawScreenObjects(objects){
             stroke('#BC6ACD');
             break;
           case ShapeType.STATE:
-            fill('#323432');
+            fill(bg_color);
             stroke('#FFFF00');
             break;
           case ShapeType.RIVER:
@@ -188,8 +188,8 @@ function rangeStillValid(){
 
 var range_limits
 function calculateRangeConsts(offset = 50){
-  map_params.width = $(window).width();
-  map_params.height = $(window).height();
+  map_params.width = $("#" + map_holder_div).width();
+  map_params.height = $(window).height() - $("#" + menu_div).height();
   map_params.heightdiv2 = map_params.height>>1;
   map_params.widthdiv2 = map_params.width>>1;
 

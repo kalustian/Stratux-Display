@@ -43,6 +43,7 @@ var counter = 0;
 
 function generateShapeScreenObjects(shapes, id, layer){
   addLayer(layer);
+  let flag = null;
   if(id === ShapeType.AIRPORT){
     for(let i = 0; i < shapes.length; i++){
       if(withinLimits(shapes[i].lat, shapes[i].lon) === true){
@@ -58,6 +59,7 @@ function generateShapeScreenObjects(shapes, id, layer){
     for(let i = 0; i < shapes.length; i++){
       let shape = shapes[i];
       switch(shape.geometry.type){
+        case "LineString":
         case "Polygon":
           let out_of_bounds = true;
           let data = {};
@@ -78,7 +80,8 @@ function generateShapeScreenObjects(shapes, id, layer){
             ));
             object_count ++;
           }
-          break
+          break;
+        case "MultiLineString":
         case "MultiPolygon":
           let info = shape.properties;
           for(let j = 0; j < shape.geometry.coordinates.length; j++){
@@ -106,11 +109,15 @@ function generateShapeScreenObjects(shapes, id, layer){
               }
             }
           }
-          break
+          break;
         default:
+          flag = shape.geometry.type;
           //console.log("def: " + shape.geometry.type);
           break;
       }
     }
+  }
+  if(flag != null){
+    console.log(flag);
   }
 }

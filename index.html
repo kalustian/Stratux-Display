@@ -1,9 +1,21 @@
+<!doctype html>
 <head>
+  <meta charset="utf-8">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-TileColor" content="#23313F">
+  <meta name="viewport" content="minimum-scale=1.0, width=device-width, maximum-scale=1.0, user-scalable=no" />
+  <meta name="msapplication-TileImage" content="/img/ico/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
   <script language="javascript" type="text/javascript" src="libraries/p5.js"></script>
   <!--<script language="javascript" src="libraries/p5.dom.js"></script>
   <script language="javascript" src="libraries/gpu.js"></script>-->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="jquery/3.2.1.jquery.min.js"></script>
 
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <link rel="stylesheet" href="css/font-awesome.min.css">
 
   <script src="constants.js"></script>
   <script src="functions.js"></script>
@@ -15,5 +27,69 @@
   <title>ADS-b Display</title>
 </head>
 <body>
+
+  <div id="map_holder"></div>
+
+  <div id="info_bar">
+    <div id="info_header">
+      KCCO
+      <span>Newnan-Coweta Airport </span>
+    </div>
+    <div id="info_body_container">
+      <div id=info_body>
+        Body Text
+      </div>
+    </div>
+    <div id="info_buttons" class="noselect">
+      <div name="A">A</div><div name="B">B</div><div name="C">C</div>
+    </div>
+  </div>
+
+  <div class="status_bar status_right">
+    Speed: 100 KTS
+  </div>
+
+  <div id="menu">
+    <div class="menu_icon menu_right">
+      <span class="fa-stack icon-bg fa-lg">
+        <i class="fa fa-terminal fa-stack-1x icon-symbol-light{" name="icon"></i>
+      </span>
+    </div>
+    <div class="menu_icon menu_left">
+      <span class="fa-stack icon-bg fa-lg badge">
+        <i class="fa fa-gear fa-stack-1x icon-symbol-light{" name="icon"></i>
+      </span>
+    </div>
+    <div class="menu_area menu_center">
+      Text Here. More text! Text everywhere.
+    </div>
+  </div>
+
+  <div id="map_icons">
+    <div class="icon icon-extra-space" id="cloud-icon">
+      <span class="fa-stack icon-bg">
+        <i class="fa fa-square fa-stack-2x" name="frame"></i>
+        <i class="fa fa-cloud fa-stack-1x icon-symbol" name="icon"></i>
+      </span>
+    </div>
+    <div class="icon icon-extra-space" id="plane-icon">
+      <span class="fa-stack icon-bg">
+        <i class="fa fa-square fa-stack-2x" name="frame"></i>
+        <i class="fa fa-plane fa-stack-1x icon-symbol" name="icon"></i>
+      </span>
+    </div>
+    <div class="icon">
+      <span class="fa-stack icon-bg" id="plus-icon">
+        <i class="fa fa-square fa-stack-2x" name="frame"></i>
+        <i class="fa fa-plus fa-stack-1x icon-symbol" name="icon"></i>
+      </span>
+    </div>
+    <div class="icon">
+      <span class="fa-stack icon-bg" id="minus-icon">
+        <i class="fa fa-square fa-stack-2x" name="frame"></i>
+        <i class="fa fa-minus fa-stack-1x icon-symbol" name="icon"></i>
+      </span>
+    </div>
+  </div>
 
 </body>

@@ -8,6 +8,8 @@ var position = {lat:Math.toRadians(33.310680), lon:Math.toRadians(-84.772372), a
 
 // Current map scale, defined in miles per pixel
 var map_scale = 3;
+//var bg_color = "#323432";
+var bg_color = "#313331";
 
 var map_params = {};
 /*var airports = [
@@ -25,8 +27,49 @@ var airports;
 
 var json_imports = [];
 
-var url_pre = 'http://nornick3.zapto.org/';
-//var url_pre = 'http://192.168.10.1/display/';
+//var url_pre = 'http://nornick3.zapto.org/';
+var url_pre = '';
+var weather_toggle = false;
+var orientation_toggle = false;
+$( document ).ready(function() {
+  $( "#plus-icon" ).click(function() {
+    if(map_scale < 23){
+      map_scale *= 1.5;
+    }
+  });
+  $( "#minus-icon" ).click(function() {
+    if(map_scale > 4){
+      map_scale /= 1.5;
+    }
+  });
+  $( "#cloud-icon" ).click(function() {
+    weather_toggle = !weather_toggle;
+    $( '#cloud-icon [name="frame"]' ).toggleClass( "icon-bg-highlight" );
+  });
+  $( "#plane-icon" ).click(function() {
+    orientation_toggle = !orientation_toggle;
+    $( '#plane-icon [name="frame"]' ).toggleClass( "icon-bg-highlight" );
+  });
+
+  $( '#info_buttons [name="A"]' ).click(function(){
+    $( '#info_buttons [name="A"]' ).toggleClass( "selected" );
+  });
+  $( '#info_buttons [name="B"]' ).click(function(){
+    $( '#info_buttons [name="B"]' ).toggleClass( "selected" );
+  });
+  $( '#info_buttons [name="C"]' ).click(function(){
+    $( '#info_buttons [name="C"]' ).toggleClass( "selected" );
+  });
+
+});
+
+function setInfoMenu(val){
+  if(val){
+    $( '#info_bar' ).css("display", "block");
+  }else{
+    $( '#info_bar' ).css("display", "none");
+  }
+}
 
 var loadedJSON = false;
 function preload() {
@@ -76,7 +119,7 @@ function preload() {
         activate();
    });
    /*$.getJSON(url_pre + 'json/Rivers.json', function(data) {
-        rivers = data.features;
+        json_imports.push({id: ShapeType.RIVER, layer: 8, data: data.features})
         console.log("Process Rivers");
         //generateShapeScreenObjects(rivers, ShapeType.RIVER);
         activate();
@@ -92,13 +135,15 @@ function preload() {
 
 
 var conn;
-
+var myCanvas;
+var map_holder_div = "map_holder";
+var menu_div = "menu";
 function setup(){
-
   trafficInit();
   situationInit();
 
-  createCanvas(map_params.width, map_params.height);
+  myCanvas = createCanvas(map_params.width, map_params.height);
+  myCanvas.parent(map_holder_div);
   background('#0f82e6');
   //console.log(position);
   noLoop();
@@ -122,11 +167,10 @@ function draw(){
   //theta += 0.15;
   clear();
   background('#0f82e6');
-
   position.screen_x = map_params.widthdiv2 = map_params.width>>1;
   position.screen_y = map_params.heightdiv2 = map_params.height>>1;
 
-  //position.rotation += 0.005;
+  position.rotation += 0.0005;
 
   //console.log(lat);
   //position.lat += 0.00575958653 * val;
@@ -156,7 +200,7 @@ function draw(){
     // Draw top-layer interface items
     drawUser();
 
-    console.log("T:" + trafficCount + " :: S:" + situationCount);
+    //console.log("T:" + trafficCount + " :: S:" + situationCount);
     trafficCount = 0;
     situationCount = 0;
   }else{
