@@ -311,6 +311,17 @@ function drawInvalid(){
   strokeWeight(1);
 }
 
+function drawFrameRate(){
+  let rate = getFrameRate();
+  trans(map_params.width - 5, 15);
+  noStroke();
+  fill('#FFFFFF');
+  textAlign(RIGHT);
+  text(rate.toFixed(1), 0, 0);
+  textAlign(LEFT);
+  trans_rev();
+}
+
 function drawCompass(radial){
   noStroke();
   fill('#B22222');

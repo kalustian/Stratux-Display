@@ -200,6 +200,8 @@ function draw(){
     // Draw top-layer interface items
     drawUser();
 
+    drawFrameRate();
+
     //console.log("T:" + trafficCount + " :: S:" + situationCount);
     trafficCount = 0;
     situationCount = 0;
