@@ -189,7 +189,7 @@ function rangeStillValid(){
 var range_limits
 function calculateRangeConsts(offset = 50){
   map_params.width = $("#" + map_holder_div).width();
-  map_params.height = $(window).height() - $("#" + menu_div).height();
+  map_params.height = $(window).height() - $("#" + menu_div).height() - $("#header_bar").height();
   map_params.heightdiv2 = map_params.height>>1;
   map_params.widthdiv2 = map_params.width>>1;
 
