@@ -317,6 +317,7 @@ function drawFrameRate(){
   noStroke();
   fill('#FFFFFF');
   textAlign(RIGHT);
+  textSize(9)
   text(rate.toFixed(1), 0, 0);
   textAlign(LEFT);
   trans_rev();

@@ -1,0 +1,49 @@
+/*.circle:before {
+  content: ' \25CF';
+  font-size: 40px;
+}*/
+.circle {
+	width: 14px;
+	height: 14px;
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
+	border-radius: 7px;
+  /*position: relative;
+  top: 8px;
+  left: 8px;*/
+  font-family: 'AileronRegular';
+}
+
+.circle_vfr{
+  background-color: #00c729;
+}
+.circle_ifr{
+  background-color: #fd0000;
+}
+.circle_lifr{
+  background-color: #ff31fb;
+}
+.circle_mvfr{
+  background-color: #326dd5;
+}
+
+.vfr{
+  color: #00c729;
+}
+.ifr{
+  color: #fd0000;
+}
+.lifr{
+  color: #ff31fb;
+}
+.mvfr{
+  color: #326dd5;
+}
+
+span.vfr:before {
+  color: #00c729;
+  content: ' \25CF';
+  font-size: 28px;
+  position: relative;
+  top: -2px;
+}

@@ -66,8 +66,12 @@ $( document ).ready(function() {
 function setInfoMenu(val){
   if(val){
     $( '#info_bar' ).css("display", "block");
+    $( '#status_bar' ).removeClass('status_top_right');
+    $( '#status_bar' ).addClass('status_bottom_left');
   }else{
     $( '#info_bar' ).css("display", "none");
+    $( '#status_bar' ).removeClass('status_bottom_left');
+    $( '#status_bar' ).addClass('status_top_right');
   }
 }
 

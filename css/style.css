@@ -105,11 +105,12 @@ html, body {
   color: #FFFFFF;
   background-image: url(../images/chevron-dark-blue.png);
   background-repeat: repeat;
+  z-index: 2;
 }
 
 .menu_icon{
   height:100%;
-  width:auto;
+  width: 50px;
   padding:0px;
   margin-top: auto;
   background-color: #293f55;
@@ -145,29 +146,60 @@ html, body {
 /* Status Bar Css */
 
 .status_bar{
-  height:30px;
-  width:150px;
+  width:100px;
   background: rgba(0, 0, 0, .5);
   position: fixed;
-  bottom: 60px;
   padding:2px;
   border-radius: 5px;
-  color: rgba(255, 255, 255, .8);
+  color: rgba(255, 255, 255, .9);
   font-size: 8pt;
 }
 
-.status_left{
-  left: 10px;
+.status_bottom_left{
+  right: 10px;
+  bottom: 60px;
 }
 
-.status_right{
-  right: 10px;
+.status_top_right{
+  left: 10px;
+  top: 28px;
+}
+
+.status_field{
+  width: 100%;
+  height: 15px;
+  line-height: 15px;
+  vertical-align: middle;
+  text-align: left;
+}
+
+.status_field > span{
+  display: inline-block;
+  display: -moz-inline-box;
+  *display: inline; /* For IE7 */
+  zoom: 1; /* Trigger hasLayout */
+  width: 45%;
+  float: right;
+  /*border-right: 1px solid #e7ebee;*/
+  font-family: 'AileronThin';
+}
+
+.status_field > span:first-child{
+  text-align: right;
+  float: left;
+  width: 45%;
+}
+
+.status_field_sep{
+  width: 100%;
+  height: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, .9);
 }
 
 /* Info Bar CSS */
 
 #info_bar{
-  width:230px;
+  width:250px;
   height:380px;
   position: fixed;
   display: block;
@@ -196,25 +228,26 @@ html, body {
   margin-top: 5px;
   overflow: hidden;
   height: 322px;
-  background-color: #e7ebee;
-
+  background-color: #FFF;
   color: #333;
 }
 
 #info_body{
-  width:100%;
+  /*width:230px;*/
   height:100%;
-  padding:5px;
-  overflow: hidden;
+  overflow: scroll;
 }
 
 #info_buttons{
-  width:230px;
+  width:100%;
   height:25px;
-  position: absolute;
-  bottom: 5px;
-  left: 5px;
+  padding-top: 5px;
   cursor: pointer;
+}
+
+.middle_button{
+  /*border-left: 1px solid #e7ebee;*/
+
 }
 
 #info_buttons > div {
@@ -228,11 +261,102 @@ html, body {
   height: 25px;
   vertical-align: middle;
   line-height: 25px;
+  /*border-right: 1px solid #e7ebee;*/
+  font-family: 'AileronThin';
 }
 
 #info_buttons>div:hover{
   background-color: #000;
   color: #FFF;
+}
+
+#info_main_status{
+  height: 30px;
+  background-color: #e7ebee;
+  border-bottom: 1px solid #d6dce0;
+}
+
+#info_main_status_marker{
+  display: inline-block;
+  height: 100%;
+  padding-left: 6px;
+}
+
+.status_circle{
+  display: inline-block;
+  transform: translate(0%,50%);
+}
+
+.status_circle_text{
+  display: inline-block;
+  transform: translate(0%,25%);
+  line-height: 20px;
+}
+
+#info_main_status_time{
+  display: inline-block;
+  height: 100%;
+  padding-right: 6px;
+  transform: translate(0%,25%);
+  float: right;
+}
+
+#info_scroll_zone{
+  width: 100%;
+  /*height: 20px;*/
+}
+
+.text_zone{
+  background-color: #FFFFFF;
+  font-family: 'AileronRegular';
+  padding: 5px;
+  border-bottom: 1px solid #d6dce0;
+}
+
+.green{
+  color: #00c729;
+}
+
+.title_zone{
+  width: 100%;
+  background-color: #e5e9ec;
+  height: 25px;
+  text-align: left;
+  padding-left: 5px;
+  line-height: 25px;
+  vertical-align: middle;
+  color: 757e84;
+  font-family: 'AileronThin';
+  text-transform: uppercase;
+  border-bottom: 1px solid #d6dce0;
+}
+
+.field_box{
+  width: 100%;
+  background-color: #f5f5f5;
+  height: 30px;
+  line-height: 30px;
+  vertical-align: middle;
+  border-bottom: 1px solid #d6dce0;
+  text-align: left;
+  color: #162a93;
+}
+.field_box > span{
+  display: inline-block;
+  display: -moz-inline-box;
+  *display: inline; /* For IE7 */
+  zoom: 1; /* Trigger hasLayout */
+  width: 50%;
+  float: right;
+  /*border-right: 1px solid #e7ebee;*/
+  font-family: 'AileronThin';
+}
+
+.field_box > span:first-child{
+  text-align: right;
+  float: left;
+  color: #000;
+  width: 33%;
 }
 
 .selected {

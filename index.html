@@ -15,6 +15,8 @@
   <script src="jquery/3.2.1.jquery.min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="css/style.css">
+  <link rel="stylesheet" type="text/css" href="css/elements.css">
+  <link rel="stylesheet" type="text/css" href="css/console.css">
   <link rel="stylesheet" href="css/font-awesome.min.css">
 
   <script src="constants.js"></script>
@@ -23,74 +25,104 @@
   <script src="traffic.js"></script>
   <script src="situation.js"></script>
   <script src="drawHelpers.js"></script>
+  <script src="console.js"></script>
   <script src="main.js"></script>
   <title>ADS-b Display</title>
 </head>
 <body>
 
-  <div id="header_bar">STRATUX DISPLAY</div>
+  <div id="header_bar" class="noselect">STRATUX DISPLAY</div>
 
-  <div id="map_holder"></div>
+  <div id="console">
+    <div id="print_area"></div>
+    <textarea id="input_area" rows="1"></textarea>
+</div>
 
-  <div id="info_bar">
-    <div id="info_header">
-      KCCO
-      <span>Newnan-Coweta Airport </span>
-    </div>
-    <div id="info_body_container">
-      <div id=info_body>
-        Body Text
+  <div id="normal_screen">
+    <div id="map_holder"></div>
+    <div id="info_bar">
+      <div id="info_header" class="noselect">
+        KCCO
+        <span>Newnan-Coweta Airport </span>
+      </div>
+      <div id="info_body_container">
+        <div id=info_body>
+          <div id="info_main_status" class="noselect">
+            <div id="info_main_status_marker">
+              <div class="status_circle circle circle_vfr" ></div>
+              <div class="status_circle_text vfr" >VFR</div>
+            </div>
+            <div id="info_main_status_time">74m ago</div>
+          </div>
+          <div id="info_scroll_zone" class="noselect">
+
+            <div class="text_zone green">
+              KCCO 160515Z AUTO 31004KT 10SM CLR 00/M05 A3023 RMK AO2 T00021050
+            </div>
+            <!--<div class="field_box"></span><span><span class="vfr"></span><span class="green">VFR</span></div>-->
+            <div class="field_box"><span>Time</span><span>12:15 AM EST</span></div>
+            <div class="field_box"><span>Wind</span><span>310° at 4 kts</span></div>
+            <div class="field_box"><span>Visibility</span><span>10 sm</span></div>
+            <div class="title_zone">nearby weather</div>
+          </div>
+        </div>
+      </div>
+      <div id="info_buttons" class="noselect">
+        <div name="A">Info</div><div class="middle_button" name="B">METAR</div><div name="C">Forecast</div>
       </div>
     </div>
-    <div id="info_buttons" class="noselect">
-      <div name="A">A</div><div name="B">B</div><div name="C">C</div>
-    </div>
-  </div>
 
-  <div class="status_bar status_right">
-    Speed: 100 KTS
+    <div id="status_bar" class="status_bar status_bottom_left">
+      <div class="status_field"><span>Altitude</span><span>4300 ft</span></div>
+      <div class="status_field"><span>Speed</span><span>100 kts</span></div>
+      <div class="status_field"><span>Heading</span><span>121°</span></div>
+      <div class="status_field_sep"></div>
+      <div class="status_field"><span># Traffic</span><span>17</span></div>
+      <div class="status_field"><span># Tower</span><span>3</span></div>
+      <div class="status_field"><span># Msg/s</span><span>129</span></div>
+    </div>
+
+    <div id="map_icons">
+      <div class="icon icon-extra-space" id="cloud-icon">
+        <span class="fa-stack icon-bg">
+          <i class="fa fa-square fa-stack-2x" name="frame"></i>
+          <i class="fa fa-cloud fa-stack-1x icon-symbol" name="icon"></i>
+        </span>
+      </div>
+      <div class="icon icon-extra-space" id="plane-icon">
+        <span class="fa-stack icon-bg">
+          <i class="fa fa-square fa-stack-2x" name="frame"></i>
+          <i class="fa fa-plane fa-stack-1x icon-symbol" name="icon"></i>
+        </span>
+      </div>
+      <div class="icon">
+        <span class="fa-stack icon-bg" id="plus-icon">
+          <i class="fa fa-square fa-stack-2x" name="frame"></i>
+          <i class="fa fa-plus fa-stack-1x icon-symbol" name="icon"></i>
+        </span>
+      </div>
+      <div class="icon">
+        <span class="fa-stack icon-bg" id="minus-icon">
+          <i class="fa fa-square fa-stack-2x" name="frame"></i>
+          <i class="fa fa-minus fa-stack-1x icon-symbol" name="icon"></i>
+        </span>
+      </div>
+    </div>
   </div>
 
   <div id="menu">
-    <div class="menu_icon menu_right">
+    <div id="terminal_button" class="menu_icon menu_right">
       <span class="fa-stack icon-bg fa-lg">
         <i class="fa fa-terminal fa-stack-1x icon-symbol-light{" name="icon"></i>
       </span>
     </div>
-    <div class="menu_icon menu_left">
+    <div id="settings_button" class="menu_icon menu_left">
       <span class="fa-stack icon-bg fa-lg badge">
         <i class="fa fa-gear fa-stack-1x icon-symbol-light{" name="icon"></i>
       </span>
     </div>
     <div class="menu_area menu_center">
       Text Here. More text! Text everywhere.
-    </div>
-  </div>
-
-  <div id="map_icons">
-    <div class="icon icon-extra-space" id="cloud-icon">
-      <span class="fa-stack icon-bg">
-        <i class="fa fa-square fa-stack-2x" name="frame"></i>
-        <i class="fa fa-cloud fa-stack-1x icon-symbol" name="icon"></i>
-      </span>
-    </div>
-    <div class="icon icon-extra-space" id="plane-icon">
-      <span class="fa-stack icon-bg">
-        <i class="fa fa-square fa-stack-2x" name="frame"></i>
-        <i class="fa fa-plane fa-stack-1x icon-symbol" name="icon"></i>
-      </span>
-    </div>
-    <div class="icon">
-      <span class="fa-stack icon-bg" id="plus-icon">
-        <i class="fa fa-square fa-stack-2x" name="frame"></i>
-        <i class="fa fa-plus fa-stack-1x icon-symbol" name="icon"></i>
-      </span>
-    </div>
-    <div class="icon">
-      <span class="fa-stack icon-bg" id="minus-icon">
-        <i class="fa fa-square fa-stack-2x" name="frame"></i>
-        <i class="fa fa-minus fa-stack-1x icon-symbol" name="icon"></i>
-      </span>
     </div>
   </div>
 
