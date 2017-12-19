@@ -5582,7 +5582,7 @@ env = function () {
   /**
    *  Trigger the Attack, and Decay portion of the Envelope.
    *  Similar to holding down a key on a piano, but it will
-   *  hold the sustain level until you let go. Input can be
+   *  hold the sustain level until you var go. Input can be
    *  any p5.sound object, or a <a href="
    *  http://docs.webplatform.org/wiki/apis/webaudio/AudioParam">
    *  Web Audio Param</a>.
@@ -6380,7 +6380,7 @@ audioin = function () {
     // create an amplitude, connect to it by default but not to master out
     this.amplitude = new p5.Amplitude();
     this.output.connect(this.amplitude.input);
-    // Some browsers let developer determine their input sources
+    // Some browsers var developer determine their input sources
     if (typeof window.MediaStreamTrack === 'undefined') {
       if (errorCallback) {
         errorCallback();

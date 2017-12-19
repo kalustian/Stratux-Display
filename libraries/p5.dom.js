@@ -796,7 +796,7 @@
         }
       }
 
-      // Now let's handle when a file was selected
+      // Now var's handle when a file was selected
       elt.addEventListener('change', handleFileSelect, false);
       return addElement(elt, this);
     } else {

@@ -1,20 +1,20 @@
 function relativePosition(pos1, pos2){
-  let out = {};
-  let lat1 = pos1.lat;
-  let lat2 = pos2.lat;
-  let lon1 = pos1.lon;
-  let lon2 = pos2.lon;
-  let delta_lat = (pos2.lat-pos1.lat);
-  let delta_lon = (pos2.lon-pos1.lon);
+  var out = {};
+  var lat1 = pos1.lat;
+  var lat2 = pos2.lat;
+  var lon1 = pos1.lon;
+  var lon2 = pos2.lon;
+  var delta_lat = (pos2.lat-pos1.lat);
+  var delta_lon = (pos2.lon-pos1.lon);
 
-  let a = Math.sin(delta_lat/2) * Math.sin(delta_lat/2) +
+  var a = Math.sin(delta_lat/2) * Math.sin(delta_lat/2) +
         Math.cos(lat1) * Math.cos(lat2) *
         Math.sin(delta_lon/2) * Math.sin(delta_lon/2);
-  let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
   out.dist = c * Rxm2nmi;
 
-  let y = Math.sin(lon2-lon1) * Math.cos(lat2);
-  let x = Math.cos(lat1)*Math.sin(lat2) -
+  var y = Math.sin(lon2-lon1) * Math.cos(lat2);
+  var x = Math.cos(lat1)*Math.sin(lat2) -
         Math.sin(lat1)*Math.cos(lat2)*Math.cos(lon2-lon1);
   out.bearing = Math.atan2(y, x) + position.rotation - PI/2;
 
@@ -22,7 +22,7 @@ function relativePosition(pos1, pos2){
 }
 
 function bearingDistanceToLatLon(brng, d, lat, lon){
-  let out = {};
+  var out = {};
   d = d / m2nmi;
   out.lat = Math.asin( Math.sin(lat)*Math.cos(d/R) + Math.cos(lat)*Math.sin(d/R)*Math.cos(brng) );
   out.lon = lon + Math.atan2(Math.sin(brng)*Math.sin(d/R)*Math.cos(lat), Math.cos(d/R)-Math.sin(lat)*Math.sin(out.lat));
@@ -30,14 +30,14 @@ function bearingDistanceToLatLon(brng, d, lat, lon){
 }
 
 function pixelToLatLon(x, y){
-  let center_x = map_params.widthdiv2;
-  let center_y = map_params.heightdiv2;
-  let d_x = x - center_x;
-  let d_y = y - center_y;
-  let out = {};
-  out.dist = sqrt(d_x * d_x + d_y * d_y) / map_scale;
-  out.angle = -atan2(d_y, d_x) + PI + position.rotation - PI/2;
-  let tmp = bearingDistanceToLatLon(out.angle, out.dist, position.lat, position.lon);
+  var center_x = map_params.widthdiv2;
+  var center_y = map_params.heightdiv2;
+  var d_x = x - center_x;
+  var d_y = y - center_y;
+  var out = {};
+  out.dist = Math.sqrt(d_x * d_x + d_y * d_y) / map_scale;
+  out.angle = -Math.atan2(d_y, d_x) + PI + position.rotation - PI/2;
+  var tmp = bearingDistanceToLatLon(out.angle, out.dist, position.lat, position.lon);
   //out.lat = Math.toDegrees(tmp.lat);
   //out.lon = Math.toDegrees(tmp.lon);
   out.lat = tmp.lat;
@@ -54,8 +54,8 @@ function pixelToLatLon(x, y){
 
 function fastDistance(point1, point0){
   deglen = 80.25;
-  let x = point1.lat - point0.lat;
-  let y = (point1.lon - point0.lon)*Math.cos(point0.lat);
+  var x = point1.lat - point0.lat;
+  var y = (point1.lon - point0.lon)*Math.cos(point0.lat);
   return deglen*sqrt(x*x + y*y);
 }
 
@@ -104,23 +104,50 @@ function activate(){
   loaded_states ++;
   if(loaded_states >= imported_files){
     loadedJSON = true;
+    console.log("");
+    console.log("Database initialization <span class=\"notice\">complete</span>.")
+    console.log("Calculating initial map block.")
     calculateCurrentBlock();
+    console.log("Starting main process.")
     loop();
+    console.log("Switching to map.")
+    console.log("");
+    setInfoMenu(false);
+    setTimeout(function(){
+      setConsole(false);
+    },1000);
+  }
+}
+
+function active_override(){
+  loaded_states = imported_files;
+  activate();
+}
+
+var errorHasBeenReported = false;
+function commentOnError(){
+  if(errorHasBeenReported === false){
+    console.log("");
+    console.error("An error has occured downloading one or more map elements.");
+    console.log("Restart the download process by typing \"<span class=\"high_command\">preload()</span>\".");
+    console.log("To continue anyway, type \"<span class=\"high_command\">active_override()</span>\".");
+    console.log("");
+    errorHasBeenReported = true;
   }
 }
 
 function calculateCurrentBlock(){
   object_count = 0;
-  let tmp_rotation = position.rotation;
+  var tmp_rotation = position.rotation;
   calculateRangeConsts();
   position.rotation = 0;
   clearShapeScreenObjects();
   referencePos = new Position(Math.toDegrees(position.lat), Math.toDegrees(position.lon), 0, 0);
-  for(let i = 0; i < json_imports.length; i++){
+  for(var i = 0; i < json_imports.length; i++){
     generateShapeScreenObjects(json_imports[i].data, json_imports[i].id, json_imports[i].layer);
   }
   position.rotation = tmp_rotation;
-  console.log("Block recalculation: Objects: " + object_count);
+  //console.log("Block recalculation: Objects: " + object_count);
 }
 
 // Converts from degrees to radians.

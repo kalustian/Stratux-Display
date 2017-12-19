@@ -15,24 +15,17 @@ function Position(lat, lon, x, y){
 }
 
 function updatePosition(pos){
-  let out = relativePosition(referencePos, pos); // Bearing + Dist
+  var out = relativePosition(referencePos, pos); // Bearing + Dist
   pos.out = out;
   pos.x = referencePos.x + out.dist * Math.cos(out.bearing);
   pos.y = referencePos.y + out.dist * Math.sin(out.bearing);
 }
 
-function ScreenObject(type, pos, data){
+function ScreenObject(type, pos, data, color_override){
   this.type = type;
   this.pos = pos;
   this.data = data;
-}
-
-function generateAirportScreenObjects(){
-  airport_screen_objects = [];
-  for(let i = 0; i < airports.length; i++){
-    let obj = new ScreenObject(ObjectTypes.AIRPORT, new Position(airports[i].lat, airports[i].lon), airports[i]);
-    airport_screen_objects.push(obj);
-  }
+  this.color_override = color_override;
 }
 
 function clearShapeScreenObjects(){
@@ -40,84 +33,98 @@ function clearShapeScreenObjects(){
 }
 
 var counter = 0;
-
 function generateShapeScreenObjects(shapes, id, layer){
   addLayer(layer);
-  let flag = null;
+  var flag = null;
   if(id === ShapeType.AIRPORT){
-    for(let i = 0; i < shapes.length; i++){
+    // Current list is an airport
+    for(var i = 0; i < shapes.length; i++){
       if(withinLimits(shapes[i].lat, shapes[i].lon) === true){
-        shape_screen_objects[layer].push(new ScreenObject(
+        var obj = new ScreenObject(
           id,
           new Position(shapes[i].lat, shapes[i].lon),
           shapes[i]
-        ));
+        );
+        shape_screen_objects[layer].push(obj);
         object_count ++;
       }
     }
   }else{
-    for(let i = 0; i < shapes.length; i++){
-      let shape = shapes[i];
-      switch(shape.geometry.type){
-        case "LineString":
-        case "Polygon":
-          let out_of_bounds = true;
-          let data = {};
-          data.info = shape.properties;
+    // Current list is not an airport. Geomerty involved.
+    for(var i = 0; i < shapes.length; i++){
+      var shape = shapes[i];
+      switch(shape.type){
+        case "p":
+          var out_of_bounds = true;
+          var data = {};
           data.coords = [];
-          for(let j = 0; j < shape.geometry.coordinates[0].length; j++){
-            let coord = shape.geometry.coordinates[0][j];
-            if(out_of_bounds === true && withinLimits(coord[1], coord[0])){
+          var state_override = false;
+          if(id === ShapeType.STATE && stateOverlap(shape.bdr))
+            state_override = true;
+          for(var j = 0; j < shape.dat.length; j++){
+            var coord = shape.dat[j];
+            var lat = 0;
+            var lon = 0;
+            if(id === ShapeType.CLASS_B || id === ShapeType.CLASS_C || id === ShapeType.CLASS_D){
+              lat = coord[0];
+              lon = coord[1];
+            }else{
+              lat = coord[1];
+              lon = coord[0];
+            }
+            if(out_of_bounds === true && (state_override === true || withinLimits(lat, lon))) {
               out_of_bounds = false;
             }
-            data.coords.push(new Position(coord[1], coord[0]));
+            data.coords.push(new Position(lat, lon));
           }
+          var color_override = null;
           if(!out_of_bounds){
             shape_screen_objects[layer].push(new ScreenObject(
               id,
               data.coords[0],
-              data
+              data,
+              color_override
             ));
             object_count ++;
           }
           break;
-        case "MultiLineString":
-        case "MultiPolygon":
-          let info = shape.properties;
-          for(let j = 0; j < shape.geometry.coordinates.length; j++){
-            let main = shape.geometry.coordinates[j];
-            let out_of_bounds = true;
-            for(let z = 0; z < main.length; z++){
-              let sub = main[z];
-              let data = {};
-              data.info = info;
-              data.coords = [];
-              for(let a = 0; a < sub.length; a++){
-                let coord = sub[a];
-                if(out_of_bounds === true && withinLimits(coord[1], coord[0])){
-                  out_of_bounds = false;
-                }
-                data.coords.push(new Position(coord[1], coord[0]));
-              }
-              if(!out_of_bounds){
-                shape_screen_objects[layer].push(new ScreenObject(
-                  id,
-                  data.coords[0],
-                  data
-                ));
-                object_count ++;
-              }
+        case "l":
+          var out_of_bounds = true;
+          var data = {};
+          data.coords = [];
+          var state_override = false;
+          if(id === ShapeType.STATE && stateOverlap(shape.bdr))
+            state_override = true;
+          for(var j = 0; j < shape.dat.length; j++){
+            var coord = shape.dat[j];
+            var lat = 0;
+            var lon = 0;
+            lat = coord[1];
+            lon = coord[0];
+            if(out_of_bounds === true && (state_override === true || withinLimits(lat, lon))) {
+              out_of_bounds = false;
             }
+            data.coords.push(new Position(lat, lon));
+          }
+          var color_override = null;
+          if(!out_of_bounds){
+            shape_screen_objects[layer].push(new ScreenObject(
+              id,
+              data.coords[0],
+              data,
+              color_override
+            ));
+            object_count ++;
           }
           break;
         default:
-          flag = shape.geometry.type;
-          //console.log("def: " + shape.geometry.type);
+          flag = "Unknown shape type: " + shape.type;
           break;
       }
     }
   }
   if(flag != null){
-    console.log(flag);
+    console.warn(flag);
   }
+  return;
 }

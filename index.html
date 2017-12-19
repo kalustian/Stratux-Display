@@ -2,31 +2,46 @@
 <head>
   <meta charset="utf-8">
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <!--<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">-->
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-TileColor" content="#23313F">
   <meta name="viewport" content="minimum-scale=1.0, width=device-width, maximum-scale=1.0, user-scalable=no" />
   <meta name="msapplication-TileImage" content="/img/ico/ms-icon-144x144.png">
   <meta name="theme-color" content="#ffffff">
 
-  <script language="javascript" type="text/javascript" src="libraries/p5.js"></script>
-  <!--<script language="javascript" src="libraries/p5.dom.js"></script>
-  <script language="javascript" src="libraries/gpu.js"></script>-->
-  <script src="jquery/3.2.1.jquery.min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="css/style.css">
   <link rel="stylesheet" type="text/css" href="css/elements.css">
   <link rel="stylesheet" type="text/css" href="css/console.css">
   <link rel="stylesheet" href="css/font-awesome.min.css">
 
-  <script src="constants.js"></script>
-  <script src="functions.js"></script>
-  <script src="screenObject.js"></script>
-  <script src="traffic.js"></script>
-  <script src="situation.js"></script>
-  <script src="drawHelpers.js"></script>
-  <script src="console.js"></script>
-  <script src="main.js"></script>
+  <script type="text/javascript">
+window.addEventListener('error', function(e) {
+    console.log(e);
+}, true);
+</script>
+
+  <!-- Include libraries and dependancies -->
+  <script type="text/javascript" src="libraries/p5.js"></script>
+  <script type="text/javascript" src="jquery/3.2.1.jquery.min.js"></script>
+  <script type="text/javascript" src="zip.js"></script>
+  <script type="text/javascript" src="unzipper.js"></script>
+  <!-- Constants -->
+  <script type="text/javascript" src="constants.js"></script>
+  <!-- Script for handling screen touches -->
+  <script type="text/javascript" src="screen_press_mgmt.js"></script>
+  <!-- Hard math functions -->
+  <script type="text/javascript" src="functions.js"></script>
+  <!-- Screen object calculations -->
+  <script type="text/javascript" src="screenObject.js"></script>
+  <!-- Display screen objects -->
+  <script type="text/javascript" src="drawHelpers.js"></script>
+  <!-- Websocket interface -->
+  <script type="text/javascript" src="websocket_interface.js"></script>
+  <!-- Console scripts and helpters -->
+  <script type="text/javascript" src="console.js"></script>
+  <!-- Main script -->
+  <script type="text/javascript" src="main.js"></script>
   <title>ADS-b Display</title>
 </head>
 <body>
@@ -35,11 +50,17 @@
 
   <div id="console">
     <div id="print_area"></div>
-    <textarea id="input_area" rows="1"></textarea>
+    <input type="text" id="input_area"></input>
+    <div id="console_submit" class="noselect">
+      <span class="fa-stack icon-bg badge">
+        <i class="fa fa-arrow-right fa-stack-1x icon-symbol-light{" name="icon"></i>
+      </span>
+    </div>
 </div>
 
   <div id="normal_screen">
     <div id="map_holder"></div>
+    <div id="test"></div>
     <div id="info_bar">
       <div id="info_header" class="noselect">
         KCCO
@@ -49,22 +70,12 @@
         <div id=info_body>
           <div id="info_main_status" class="noselect">
             <div id="info_main_status_marker">
-              <div class="status_circle circle circle_vfr" ></div>
-              <div class="status_circle_text vfr" >VFR</div>
+              <div class="status_circle circle circle_ifr" ></div>
+              <div class="status_circle_text ifr" >IFR</div>
             </div>
             <div id="info_main_status_time">74m ago</div>
           </div>
-          <div id="info_scroll_zone" class="noselect">
-
-            <div class="text_zone green">
-              KCCO 160515Z AUTO 31004KT 10SM CLR 00/M05 A3023 RMK AO2 T00021050
-            </div>
-            <!--<div class="field_box"></span><span><span class="vfr"></span><span class="green">VFR</span></div>-->
-            <div class="field_box"><span>Time</span><span>12:15 AM EST</span></div>
-            <div class="field_box"><span>Wind</span><span>310° at 4 kts</span></div>
-            <div class="field_box"><span>Visibility</span><span>10 sm</span></div>
-            <div class="title_zone">nearby weather</div>
-          </div>
+          <div id="info_scroll_zone" class="noselect"></div>
         </div>
       </div>
       <div id="info_buttons" class="noselect">
@@ -72,7 +83,7 @@
       </div>
     </div>
 
-    <div id="status_bar" class="status_bar status_bottom_left">
+    <div id="status_bar" class="status_bar status_bottom_left noselect">
       <div class="status_field"><span>Altitude</span><span>4300 ft</span></div>
       <div class="status_field"><span>Speed</span><span>100 kts</span></div>
       <div class="status_field"><span>Heading</span><span>121°</span></div>

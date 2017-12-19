@@ -1,140 +1,205 @@
+/* Adjust Console Handles */
+var version = "0.1.0";
+
 console.log("JS Active");
 
 // Current position of the airplane
-var position = {lat:Math.toRadians(33.310680), lon:Math.toRadians(-84.772372), alt:1000, rotation: 0.2};
-
-// Current position of the atl airport
-//var katl = {lat:33.633549, lon:-84.431150, alt:1000};
-
-// Current map scale, defined in miles per pixel
-var map_scale = 3;
-//var bg_color = "#323432";
-var bg_color = "#313331";
-
-var map_params = {};
-/*var airports = [
-  {name: "KATL", lat: 33.633549, lon: -84.431150, runways: [{angle: 9, length: 10}], radius: 1.5},
-  {name: "KCCO", lat: 33.310680, lon: -84.772372, runways: [{angle: 32, length: 5}], radius: 1},
-  {name: "KPDK", lat: 33.8738, lon: -84.30, runways: [{angle: 3, length: 6}, {angle: 34, length:4 }], radius: 1.25}
-];*/
-
-var shape_screen_objects = [];
-var traffic_screen_objects = [];
-
-
-var codefont;
-var airports;
-
-var json_imports = [];
+var position = {lat:Math.toRadians(33.310680), lon:Math.toRadians(-84.772372), alt:1000, rotation: 0};
 
 //var url_pre = 'http://nornick3.zapto.org/';
 var url_pre = '';
-var weather_toggle = false;
-var orientation_toggle = false;
+
+var scale_test = 1;
+
 $( document ).ready(function() {
-  $( "#plus-icon" ).click(function() {
-    if(map_scale < 23){
-      map_scale *= 1.5;
-    }
-  });
-  $( "#minus-icon" ).click(function() {
-    if(map_scale > 4){
-      map_scale /= 1.5;
-    }
-  });
-  $( "#cloud-icon" ).click(function() {
-    weather_toggle = !weather_toggle;
-    $( '#cloud-icon [name="frame"]' ).toggleClass( "icon-bg-highlight" );
-  });
-  $( "#plane-icon" ).click(function() {
-    orientation_toggle = !orientation_toggle;
-    $( '#plane-icon [name="frame"]' ).toggleClass( "icon-bg-highlight" );
-  });
+  // Initialize interface objects
+  initInterfaceObjects();
+  // Remove all objects from the screen object list
+  clearShapeScreenObjects();
+  // Calculate the current range based on the initial zoom level
+  calculateRangeConsts();
+  // Initialize traffic connection
+  trafficInit();
 
-  $( '#info_buttons [name="A"]' ).click(function(){
-    $( '#info_buttons [name="A"]' ).toggleClass( "selected" );
-  });
-  $( '#info_buttons [name="B"]' ).click(function(){
-    $( '#info_buttons [name="B"]' ).toggleClass( "selected" );
-  });
-  $( '#info_buttons [name="C"]' ).click(function(){
-    $( '#info_buttons [name="C"]' ).toggleClass( "selected" );
-  });
-
+  // Display console intro message
+  console.logIntro();
+  // Initialize download loading bars
+  console.log("Downloading and processing elements...")
+  console.loading_bar("download_apt_xhr", "Download APT", 0);
+  console.loading_bar("download_faa_xhr", "Download FAA", 0);
+  console.loading_bar("download_env_xhr", "Download ENV", 0);
+  console.loading_bar("unzip_apt", "Unzip APT", 0);
+  console.loading_bar("unzip_faa", "Unzip FAA", 0);
+  console.loading_bar("unzip_env", "Unzip ENV", 0);
 });
 
-function setInfoMenu(val){
-  if(val){
-    $( '#info_bar' ).css("display", "block");
-    $( '#status_bar' ).removeClass('status_top_right');
-    $( '#status_bar' ).addClass('status_bottom_left');
-  }else{
-    $( '#info_bar' ).css("display", "none");
-    $( '#status_bar' ).removeClass('status_bottom_left');
-    $( '#status_bar' ).addClass('status_top_right');
-  }
-}
+// Tmp variable to save whether the jsons have been loaded or not
+var loadedJSON;
 
-var loadedJSON = false;
+// Preload map information
 function preload() {
-  clearShapeScreenObjects();
-  calculateRangeConsts();
-   codefont = loadFont(url_pre + "fonts/monaco.ttf");
-   imported_files = 3;
-   $.getJSON(url_pre + 'json/Airports.json', function(data) {
-        json_imports.push({id: ShapeType.AIRPORT, layer: 7, data:data})
-        console.log("Process Airports");
-        activate();
-   });
-   $.getJSON(url_pre + 'json/Class_Airspace-B.json', function(data) {
-        json_imports.push({id: ShapeType.CLASS_B, layer: 6, data: data.features})
-        console.log("Process Class B");
-        //generateShapeScreenObjects(data.features, ShapeType.CLASS_B, 6);
-        activate();
-   });
-   $.getJSON(url_pre + 'json/Class_Airspace-C.json', function(data) {
-        json_imports.push({id: ShapeType.CLASS_C, layer: 5, data: data.features})
-        console.log("Process Class C");
-        //generateShapeScreenObjects(data.features, ShapeType.CLASS_C, 5);
-        activate();
-   });
-   $.getJSON(url_pre + 'json/Class_Airspace-D.json', function(data) {
-        json_imports.push({id: ShapeType.CLASS_D, layer: 4, data: data.features})
-        console.log("Process Class D");
-        //generateShapeScreenObjects(data.features, ShapeType.CLASS_D, 4);
-        activate();
-   });
-   $.getJSON(url_pre + 'json/Class_Airspace-E.json', function(data) {
-        json_imports.push({id: ShapeType.CLASS_E, layer: 3, data: data.features})
-        console.log("Process Class E");
-        //generateShapeScreenObjects(data.features, ShapeType.CLASS_E, 3);
-        activate();
-   });
-   $.getJSON(url_pre + 'json/United_States.json', function(data) {
-        json_imports.push({id: ShapeType.STATE, layer: 0, data: data.features})
-        console.log("Process State Borders");
-        //generateShapeScreenObjects(data.features, ShapeType.STATE, 1);
-        activate();
-   });
-   $.getJSON(url_pre + 'json/Lakes.json', function(data) {
-        json_imports.push({id: ShapeType.LAKE, layer: 2, data: data.features})
-        console.log("Process Lakes");
-        //generateShapeScreenObjects(data.features, ShapeType.LAKE, 2);
-        activate();
-   });
-   /*$.getJSON(url_pre + 'json/Rivers.json', function(data) {
-        json_imports.push({id: ShapeType.RIVER, layer: 8, data: data.features})
-        console.log("Process Rivers");
-        //generateShapeScreenObjects(rivers, ShapeType.RIVER);
-        activate();
-   });*/
-   $.getJSON(url_pre + 'json/Urban.json', function(data) {
-        json_imports.push({id: ShapeType.URBAN, layer: 1, data: data.features})
-        urban = data.features;
-        console.log("Process Urban Areas");
-        //generateShapeScreenObjects(urban, ShapeType.URBAN, 0);
-        activate();
-   });
+  // Load airports
+  loadedJSON = false;
+  // Reset activation counter
+  loaded_states = 0;
+  var apt_counter = 0;
+  fetchZip(url_pre + 'json/compiled_apt.json.zip', function(result){
+    console.loading_bar("unzip_apt", "Unzip APT", 1);
+    var res = [];
+    for(var key in result.airports){
+      res.push(result.airports[key]);
+    }
+    json_imports.push({id: ShapeType.AIRPORT, layer: airport_layer, data:res});
+    activate();
+  }, function(event){
+    // XHR
+    var val = event.loaded / event.total;
+    console.loading_bar("download_apt_xhr", "Download APT", val);
+  }, function(event, tag, name){
+    // Zip
+    apt_counter++;
+    if(apt_counter === 200){
+      apt_counter = 0;
+      var val = event.loaded / event.total;
+      console.loading_bar("unzip_apt", "Unzip APT", val);
+    }
+  }, function(type, obj){
+    switch(type){
+      case ErrorType.FILENOTFOUND:
+        console.loading_bar("download_apt_xhr", "Download APT", -1, "404");
+        break;
+      case ErrorType.TIMEOUT:
+        console.loading_bar("download_apt_xhr", "Download APT", -1, "Timeout");
+        break;
+      case ErrorType.ABORT:
+        console.loading_bar("download_apt_xhr", "Download APT", -1, "Download Aborted");
+        break;
+      case ErrorType.UNKNOWN:
+        console.loading_bar("download_apt_xhr", "Download APT", -1, "Unknown");
+        break;
+      case ErrorType.ZIP:
+        console.loading_bar("unzip_apt", "Unzip APT", -1, "Unzip Error");
+        break;
+    }
+    commentOnError();
+  });
+
+  // Load environmental data
+  var env_counter = 0;
+  fetchZip(url_pre + 'json/compiled_env.json.zip', function(result){
+    console.loading_bar("download_env_xhr", "Download ENV", 1);
+    for(var key in result){
+      switch(key){
+        case "lakes":
+          json_imports.push({id: ShapeType.LAKE, layer: 2, data:result[key]});
+          break;
+        case "rivers":
+          json_imports.push({id: ShapeType.RIVER, layer: 2, data:result[key]});
+          break;
+        case "urban":
+          json_imports.push({id: ShapeType.URBAN, layer: 1, data:result[key]});
+          break;
+        case "states":
+          json_imports.push({id: ShapeType.STATE, layer: 0, data:result[key]});
+          break;
+      }
+      activate();
+    }
+  }, function(event){
+    // XHR
+    var val = event.loaded / event.total;
+    console.loading_bar("download_env_xhr", "Download ENV", val);
+  }, function(event, tag, name){
+    // Zip
+    env_counter++;
+    if(env_counter === 200){
+      env_counter = 0;
+      var val = event.loaded / event.total;
+      console.loading_bar("unzip_env", "Unzip ENV", val);
+    }
+  }, function(type, obj){
+    switch(type){
+      case ErrorType.FILENOTFOUND:
+        console.loading_bar("download_env_xhr", "Download ENV", -1, "404");
+        break;
+      case ErrorType.TIMEOUT:
+        console.loading_bar("download_env_xhr", "Download ENV", -1, "Timeout");
+        break;
+      case ErrorType.ABORT:
+        console.loading_bar("download_env_xhr", "Download ENV", -1, "Download Aborted");
+        break;
+      case ErrorType.UNKNOWN:
+        console.loading_bar("download_env_xhr", "Download ENV", -1, "Unknown");
+        break;
+      case ErrorType.ZIP:
+        console.loading_bar("unzip_env", "Unzip ENV", -1, "Unzip Error");
+        break;
+    }
+    commentOnError();
+  });
+
+  // Load airspace data
+  var faa_counter = 0;
+  fetchZip(url_pre + 'json/compiled_faa.json.zip',function(result){
+    console.loading_bar("unzip_faa", "Unzip FAA", 1);
+    for(var key in result){
+      switch(key){
+        case "B":
+          json_imports.push({id: ShapeType.CLASS_B, layer: 6, data:result[key]});
+          //console.loading_bar("unzip_B", "Unzip Class B", 1);
+          break;
+        case "C":
+          json_imports.push({id: ShapeType.CLASS_C, layer: 5, data:result[key]});
+          //console.loading_bar("unzip_C", "Unzip Class C", 1);
+          break;
+        case "D":
+          json_imports.push({id: ShapeType.CLASS_D, layer: 4, data:result[key]});
+          //console.loading_bar("unzip_D", "Unzip Class D", 1);
+          break;
+        case "E":
+          json_imports.push({id: ShapeType.CLASS_E, layer: 3, data:result[key]});
+          //console.loading_bar("unzip_E", "Unzip Class E", 1);
+          break;
+      }
+      activate();
+    }
+  }, function(event){
+    // XHR
+    var val = event.loaded / event.total;
+    console.loading_bar("download_faa_xhr", "Download FAA", val);
+  }, function(event, tag, name){
+    // Zip
+    faa_counter++;
+    if(faa_counter === 200){
+      faa_counter = 0;
+      var val = event.loaded / event.total;
+      console.loading_bar("unzip_faa", "Unzip FAA", val);
+    }
+  }, function(type, obj){
+    switch(type){
+      case ErrorType.FILENOTFOUND:
+        console.loading_bar("download_faa_xhr", "Download FAA", -1, "404");
+        break;
+      case ErrorType.TIMEOUT:
+        console.loading_bar("download_faa_xhr", "Download FAA", -1, "Timeout");
+        break;
+      case ErrorType.ABORT:
+        console.loading_bar("download_faa_xhr", "Download FAA", -1, "Download Aborted");
+        break;
+      case ErrorType.UNKNOWN:
+        console.loading_bar("download_faa_xhr", "Download FAA", -1, "Unknown");
+        break;
+      case ErrorType.ZIP:
+        console.loading_bar("unzip_faa", "Unzip FAA", -1, "Unzip Error");
+        break;
+    }
+    commentOnError();
+  });
+
+  // Set the code font
+  codefont = loadFont(url_pre + "fonts/monaco.ttf");
+  // Specify the total number of imports
+  imported_files = 9;
 }
 
 
@@ -143,9 +208,6 @@ var myCanvas;
 var map_holder_div = "map_holder";
 var menu_div = "menu";
 function setup(){
-  trafficInit();
-  situationInit();
-
   myCanvas = createCanvas(map_params.width, map_params.height);
   myCanvas.parent(map_holder_div);
   background('#0f82e6');
@@ -156,30 +218,16 @@ function setup(){
   // Calculate constants that only need to be calculated once ever
   initialScreenObjectConstants();
 
-
+  controlLooping = true;
+  setConsole(true);
 
 }
 
-
-
-
-var theta = 0;
-
-var val = 1;
 function draw(){
-  //map_scale = sin(theta) * 0.01 + 3;
-  //theta += 0.15;
   clear();
   background('#0f82e6');
   position.screen_x = map_params.widthdiv2 = map_params.width>>1;
   position.screen_y = map_params.heightdiv2 = map_params.height>>1;
-
-  position.rotation += 0.0005;
-
-  //console.log(lat);
-  //position.lat += 0.00575958653 * val;
-  //position.lon += 0.00005;
-  val *= -1
 
   if(loadedJSON === true){
     // Check that the current range is still valid
@@ -199,14 +247,13 @@ function draw(){
     // Restore the canvas for top-layer interface items
     restoreCanvas();
     // Draw static interface items
-    //drawCompass(bands[bands.length-1]+3);
+    drawCompass();
     drawBands();
     // Draw top-layer interface items
     drawUser();
-
+    // Draw framerate meter
     drawFrameRate();
 
-    //console.log("T:" + trafficCount + " :: S:" + situationCount);
     trafficCount = 0;
     situationCount = 0;
   }else{

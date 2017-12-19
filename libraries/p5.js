@@ -10695,7 +10695,7 @@ var isNumeric =function( obj ) {
  * If any of these passes (in order), it matches:
  *
  * - p5.* definitions are checked with instanceof
- * - Booleans are let through (everything is truthy or falsey)
+ * - Booleans are var through (everything is truthy or falsey)
  * - Lowercase of the definition is checked against the js type
  * - Number types are checked to see if they are numerically castable
  */
@@ -13409,7 +13409,7 @@ p5.Renderer2D.prototype._renderText = function(p, line, x, y, maxY) {
       this.drawingContext.fillText(line, x, y);
     }
   }
-  else { // an opentype font, let it handle the rendering
+  else { // an opentype font, var it handle the rendering
 
     this._textFont._renderPath(line, x, y, { renderer: this });
   }
@@ -18531,7 +18531,7 @@ p5.prototype.loadImage = function(path, successCallback, failureCallback) {
   };
 
   //set crossOrigin in case image is served which CORS headers
-  //this will let us draw to canvas without tainting it.
+  //this will var us draw to canvas without tainting it.
   //see https://developer.mozilla.org/en-US/docs/HTML/CORS_Enabled_Image
   // When using data-uris the file will be loaded locally
   // so we don't need to worry about crossOrigin with base64 file types
