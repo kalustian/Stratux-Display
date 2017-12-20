@@ -161,7 +161,7 @@ function setConsole(val){
     $( "#terminal_button" ).addClass('selected');
     $( "#terminal_button span" ).addClass('selected');
     $( "#console" ).css('display', 'block');
-    $(" #input_area ").focus()
+    //$(" #input_area ").focus()
     setTimeout(function(){
       if(controlLooping)
         noLoop();
@@ -171,7 +171,7 @@ function setConsole(val){
   }else{
     transit = true;
     if(controlLooping)
-      loop();
+      //loop();
     setTimeout(function(){
       $( "#terminal_button" ).removeClass('selected');
       $( "#terminal_button span" ).removeClass('selected');

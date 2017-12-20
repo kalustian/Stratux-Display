@@ -1,6 +1,6 @@
 var trafficWS;
 function trafficInit(){
-  trafficWS = new WebSocket('ws://192.168.10.1/traffic');
+  trafficWS = new WebSocket('ws://192.168.33.36:8090');
 
   trafficWS.onopen = function(e) {
     console.log("Connection established!");
@@ -23,6 +23,8 @@ function trafficInit(){
     console.error("Websocket \"" + name + "\" had an error.");
   };
 }
+
+
 
 var traffic_screen_objects = {};
 var trafficCount = 0;

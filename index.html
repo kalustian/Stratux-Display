@@ -29,7 +29,7 @@ window.addEventListener('error', function(e) {
   <!-- Constants -->
   <script type="text/javascript" src="constants.js"></script>
   <!-- Script for handling screen touches -->
-  <script type="text/javascript" src="screen_press_mgmt.js"></script>
+  <!--<script type="text/javascript" src="screen_press_mgmt.js"></script>-->
   <!-- Hard math functions -->
   <script type="text/javascript" src="functions.js"></script>
   <!-- Screen object calculations -->
@@ -45,7 +45,7 @@ window.addEventListener('error', function(e) {
   <title>ADS-b Display</title>
 </head>
 <body>
-
+  <div id="cache"></div>
   <div id="header_bar" class="noselect">STRATUX DISPLAY</div>
 
   <div id="console">
@@ -59,9 +59,9 @@ window.addEventListener('error', function(e) {
 </div>
 
   <div id="normal_screen">
-    <div id="map_holder"></div>
+    <div id="map_holder" class="noselect"></div>
     <div id="test"></div>
-    <div id="info_bar">
+    <!--<div id="info_bar">
       <div id="info_header" class="noselect">
         KCCO
         <span>Newnan-Coweta Airport </span>
@@ -81,9 +81,9 @@ window.addEventListener('error', function(e) {
       <div id="info_buttons" class="noselect">
         <div name="A">Info</div><div class="middle_button" name="B">METAR</div><div name="C">Forecast</div>
       </div>
-    </div>
+    </div>-->
 
-    <div id="status_bar" class="status_bar status_bottom_left noselect">
+    <div id="status_bar" class="status_bar status_top_right noselect">
       <div class="status_field"><span>Altitude</span><span>4300 ft</span></div>
       <div class="status_field"><span>Speed</span><span>100 kts</span></div>
       <div class="status_field"><span>Heading</span><span>121°</span></div>

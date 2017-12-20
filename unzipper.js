@@ -1,4 +1,4 @@
-zip.workerScriptsPath = './zip/';
+zip.workerScriptsPath = './';
 
 function fetchZip(url, callback, xhr_progress, zip_progress, error){
   var xhr = new XMLHttpRequest();
@@ -12,7 +12,7 @@ function fetchZip(url, callback, xhr_progress, zip_progress, error){
         const reader = new FileReader();
 
         // This fires after the blob has been read/loaded.
-        reader.addEventListener('loadend', (e) => {
+        reader.addEventListener('loadend', function(e) {
           const text = e.srcElement.result;
           callback(JSON.parse(text));
         });

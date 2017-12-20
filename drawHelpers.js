@@ -288,7 +288,7 @@ function calculateRangeConsts(offset){
   map_params.widthdiv2 = map_params.width>>1;
 
   // Calculate screen click bounds
-  calculate_null_boundries();
+  //calculate_null_boundries();
 
   range_limits = {};
   /*var tmp = pixelToLatLon(-offset, -offset);

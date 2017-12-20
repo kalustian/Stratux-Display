@@ -7,6 +7,8 @@ var m2nmi = 0.000539957;
 var Rxm2nmi = R * m2nmi;
 var PI = 3.141592653589793238462643383;
 
+var websocket_url = "192.168.33.37";
+
 /* Enum Types */
 var ShapeType = {LAKE:0, RIVER:1, URBAN:2, STATE:3, CLASS_B:4, CLASS_C:5, CLASS_E:6, CLASS_D:7, AIRPORT:8, TRAFFIC:9};
 var Stroke = {LINE:0, POLY:1};
@@ -21,5 +23,9 @@ var airport_layer = 7;
 var map_params = {};
 var shape_screen_objects = [];
 var traffic_screen_objects = [];
+
+var airpoprt_weather_info = {};
+var static_stratux_info = {};
+
 var json_imports = [];
 var codefont;

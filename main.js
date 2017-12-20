@@ -1,5 +1,5 @@
 /* Adjust Console Handles */
-var version = "0.1.0";
+var version = "0.1.1";
 
 console.log("JS Active");
 
@@ -12,8 +12,9 @@ var url_pre = '';
 var scale_test = 1;
 
 $( document ).ready(function() {
+  console.log("DOC READY");
   // Initialize interface objects
-  initInterfaceObjects();
+  //initInterfaceObjects();
   // Remove all objects from the screen object list
   clearShapeScreenObjects();
   // Calculate the current range based on the initial zoom level
@@ -31,6 +32,19 @@ $( document ).ready(function() {
   console.loading_bar("unzip_apt", "Unzip APT", 0);
   console.loading_bar("unzip_faa", "Unzip FAA", 0);
   console.loading_bar("unzip_env", "Unzip ENV", 0);
+
+  $( "#plus-icon" ).click(function() {
+    if(map_scale < 23){
+      map_scale *= 1.5;
+    }
+    redraw();
+  });
+  $( "#minus-icon" ).click(function() {
+    if(map_scale > 4){
+      map_scale /= 1.5;
+    }
+    redraw();
+  });
 });
 
 // Tmp variable to save whether the jsons have been loaded or not
@@ -38,6 +52,7 @@ var loadedJSON;
 
 // Preload map information
 function preload() {
+  console.log("PRELOAD");
   // Load airports
   loadedJSON = false;
   // Reset activation counter
@@ -94,7 +109,7 @@ function preload() {
           json_imports.push({id: ShapeType.LAKE, layer: 2, data:result[key]});
           break;
         case "rivers":
-          json_imports.push({id: ShapeType.RIVER, layer: 2, data:result[key]});
+          //json_imports.push({id: ShapeType.RIVER, layer: 2, data:result[key]});
           break;
         case "urban":
           json_imports.push({id: ShapeType.URBAN, layer: 1, data:result[key]});
@@ -205,15 +220,22 @@ function preload() {
 
 var conn;
 var myCanvas;
+var map_image;
 var map_holder_div = "map_holder";
 var menu_div = "menu";
 function setup(){
+  console.log("SETUP");
   myCanvas = createCanvas(map_params.width, map_params.height);
+  map_image = createGraphics(map_params.width, map_params.height);
   myCanvas.parent(map_holder_div);
   background('#0f82e6');
+  map_image.background('#0f82e6');
   //console.log(position);
   noLoop();
   frameRate(12);
+
+  fill("#FF4A00");
+  map_image.ellipse(0,0,40);
 
   // Calculate constants that only need to be calculated once ever
   initialScreenObjectConstants();
@@ -223,6 +245,7 @@ function setup(){
 
 }
 
+var revalidate = true;
 function draw(){
   clear();
   background('#0f82e6');
@@ -231,12 +254,20 @@ function draw(){
 
   if(loadedJSON === true){
     // Check that the current range is still valid
-    if(!rangeStillValid()){
-      // Recalculate range if not
-      calculateRangeConsts();
-      // Recalculate the block
-      calculateCurrentBlock();
+    if(revalidate && !rangeStillValid()){
+      revalidate = false;
+      setTimeout( function(){
+        // Recalculate range if not
+        calculateRangeConsts();
+        // Recalculate the block
+        calculateCurrentBlock();
+        //redraw();
+        revalidate = true;
+      }, 1000);
     }
+
+    image(map_image, 0, 0);
+
     // Calculate constants for this frame
     screenObjectConstants();
     // Configure the canvas for drawing items on the map
@@ -253,6 +284,8 @@ function draw(){
     drawUser();
     // Draw framerate meter
     drawFrameRate();
+
+
 
     trafficCount = 0;
     situationCount = 0;

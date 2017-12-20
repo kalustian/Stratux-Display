@@ -26,7 +26,17 @@ function calculate_null_boundries(){
 }
 
 function mouseClicked(){
+  if(!window.mobilecheck())
+    processTouch();
+}
 
+function touchEnded(){
+  if(window.mobilecheck())
+    processTouch();
+}
+
+
+function processTouch(){
   // Ignore if the console is open
   if($("#console").css("display") !== "none")
     return;
@@ -94,13 +104,22 @@ function initInterfaceObjects(){
     }
   });
   $( '#info_buttons [name="A"]' ).click(function(){
-    $( '#info_buttons [name="A"]' ).toggleClass( "selected" );
+    $( '#info_buttons [name="A"]' ).addClass( "selected" );
+    $( '#info_buttons [name="B"]' ).removeClass( "selected" );
+    $( '#info_buttons [name="C"]' ).removeClass( "selected" );
+    selectMenuPage(MenuPage.INFO);
   });
   $( '#info_buttons [name="B"]' ).click(function(){
-    $( '#info_buttons [name="B"]' ).toggleClass( "selected" );
+    $( '#info_buttons [name="B"]' ).addClass( "selected" );
+    $( '#info_buttons [name="A"]' ).removeClass( "selected" );
+    $( '#info_buttons [name="C"]' ).removeClass( "selected" );
+    selectMenuPage(MenuPage.METAR);
   });
   $( '#info_buttons [name="C"]' ).click(function(){
-    $( '#info_buttons [name="C"]' ).toggleClass( "selected" );
+    $( '#info_buttons [name="C"]' ).addClass( "selected" );
+    $( '#info_buttons [name="B"]' ).removeClass( "selected" );
+    $( '#info_buttons [name="A"]' ).removeClass( "selected" );
+    selectMenuPage(MenuPage.FORCAST);
   });
   $( "#cloud-icon" ).click(function() {
     weather_toggle = !weather_toggle;
@@ -126,7 +145,9 @@ function setInfoMenu(val){
 }
 
 var menuInfo = {};
-var MenuPage = {INFO:0}
+var metarInfo = {};
+var forcastInfo = {};
+var MenuPage = {INFO:0, METAR:1, FORCAST:2};
 function selectMenuPage(page){
   switch(page){
     case MenuPage.INFO:
@@ -153,7 +174,14 @@ function selectMenuPage(page){
       $("#info_buttons [name=A]").addClass("selected");
       $("#info_buttons [name=B]").removeClass("selected");
       $("#info_buttons [name=C]").removeClass("selected");
-
+      break;
+    case MenuPage.METAR:
+      clearInfoArea();
+      addInfoElement(InfoTypes.NAME, menuInfo.icao, menuInfo.name);
+      break;
+    case MenuPage.FORCAST:
+      clearInfoArea();
+      addInfoElement(InfoTypes.NAME, menuInfo.icao, menuInfo.name);
       break;
   }
   setInfoMenu(true);
